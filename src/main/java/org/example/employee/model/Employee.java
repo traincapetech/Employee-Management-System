@@ -42,7 +42,7 @@ public class Employee {
     // 4. Employment Specific Fields
     private String role;                 // Intern, Full-time, Part-time, Freelancer
     private String department;           // Tech, Sales, etc.
-    private LocalDate joiningDate;
+    private Long joiningDate; // Epoch millis (e.g., from System.currentTimeMillis())
     private Integer internshipDuration;  // In months (if intern)
     private String offerLetterPath;
     private String status;               // Active, Completed, Resigned, Terminated

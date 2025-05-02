@@ -1,11 +1,9 @@
 package org.example.employee.service;
-
-import org.example.employee.model.Employee;
 import org.example.employee.repository.EmployeeRepository;
+import org.example.employee.model.Employee;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -16,7 +14,7 @@ import java.util.UUID;
 @Service
 public class EmployeeService {
 
-    private final String UPLOAD_DIR = "uploads/"; // Make sure this folder exists
+    private final String UPLOAD_DIR = "uploads/"; // Ensure this folder exists or create it dynamically
 
     @Autowired
     private EmployeeRepository employeeRepository;
@@ -28,36 +26,55 @@ public class EmployeeService {
             uploadDir.mkdirs(); // Create the directory if it doesn't exist
         }
 
-        // Save each file and map to corresponding field (basic version)
-        for (MultipartFile file : files) {
-            String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-            Path filePath = Path.of(UPLOAD_DIR, fileName);
-            file.transferTo(filePath.toFile());
+        // Check if files are provided, and if not, throw an exception or handle gracefully
+        if (files != null && !files.isEmpty()) {
+            // Save each file and map to corresponding field
+            for (MultipartFile file : files) {
+                if (file.isEmpty()) {
+                    continue; // Skip empty files
+                }
 
-            // You can map filenames to employee fields based on input name or additional logic
-            if (file.getOriginalFilename().contains("resume")) {
-                employee.setResumePath(filePath.toString());
-            } else if (file.getOriginalFilename().contains("photograph")) {
-                employee.setPhotographPath(filePath.toString());
-            } else if (file.getOriginalFilename().contains("offerLetter")) {
-                employee.setOfferLetterPath(filePath.toString());
-            } else if (file.getOriginalFilename().contains("aadharCard")) {
-                employee.setAadharCardPath(filePath.toString());
-            } // Add more conditions as needed for other fields
+                String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+                Path filePath = Path.of(UPLOAD_DIR, fileName);
+                file.transferTo(filePath.toFile());
+
+                // Map file paths to employee fields based on file name
+                String fileNameLower = file.getOriginalFilename().toLowerCase();
+                if (fileNameLower.contains("resume")) {
+                    employee.setResumePath(filePath.toString());
+                } else if (fileNameLower.contains("photograph")) {
+                    employee.setPhotographPath(filePath.toString());
+                } else if (fileNameLower.contains("offerletter")) {
+                    employee.setOfferLetterPath(filePath.toString());
+                } else if (fileNameLower.contains("aadharcard")) {
+                    employee.setAadharCardPath(filePath.toString());
+                } else if (fileNameLower.contains("pan")) {
+                    employee.setPanCardPath(filePath.toString());
+                } else if (fileNameLower.contains("pcc")) {
+                    employee.setPccPath(filePath.toString());
+                } // Add other file handling conditions as needed
+            }
+        } else {
+            // Optionally handle the case when no files are provided
+            // Throw an exception, log a message, or handle gracefully
+            System.out.println("No files uploaded. Employee data saved without files.");
         }
 
-        // Save the employee to the database (assuming EmployeeRepository extends JpaRepository)
+        // Save the employee to the database
         return employeeRepository.save(employee);
     }
 
+    // Get an employee by their ID
     public Optional<Employee> getEmployeeById(String id) {
         return employeeRepository.findById(id);
     }
 
+    // Get all employees
     public List<Employee> getAllEmployees() {
         return employeeRepository.findAll();
     }
 
+    // Delete an employee by their ID
     public void deleteEmployee(String id) {
         employeeRepository.deleteById(id);
     }

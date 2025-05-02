@@ -58,7 +58,10 @@
             <artifactId>springdoc-openapi-ui</artifactId>
             <version>1.6.6</version> <!-- Make sure to use the latest stable version -->
         </dependency>
-
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+        </dependency>
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-api</artifactId>

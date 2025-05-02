@@ -1,5 +1,6 @@
 package org.example.employee.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.employee.model.Employee;
 import org.example.employee.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,24 +22,22 @@ public class EmployeeController {
     private EmployeeService employeeService;
 
     @PostMapping
-    @Operation(
-            summary = "Add a new employee",
-            description = "This endpoint allows you to add a new employee with file upload",
-            requestBody = @RequestBody(
-                    content = @Content(
-                            mediaType = "multipart/form-data",
-                            schema = @Schema(implementation = Employee.class)
-                    )
-            )
-    )
     public ResponseEntity<Employee> addEmployee(
-            @RequestPart("employee") Employee employee,
+            @RequestPart("employee") String employeeJson,
             @RequestPart("files") List<MultipartFile> files
     ) {
         try {
-            Employee saved = employeeService.saveEmployee(employee, files);
-            return ResponseEntity.ok(saved);
+            // Create mapper
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            // Deserialize employee JSON
+            Employee employee = objectMapper.readValue(employeeJson, Employee.class);
+
+            // Save employee and files
+            Employee savedEmployee = employeeService.saveEmployee(employee, files);
+            return ResponseEntity.ok(savedEmployee);
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.badRequest().build();
         }
     }
