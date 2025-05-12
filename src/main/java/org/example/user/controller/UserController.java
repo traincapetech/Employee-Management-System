@@ -3,8 +3,9 @@ package org.example.user.controller;
 import org.example.user.dto.SignupRequest;
 import org.example.user.service.UserService;
 import org.example.user.dto.LoginRequest;
-import org.example.user.dto.AuthResponse;  // Import AuthResponse
+import org.example.user.dto.AuthResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -14,22 +15,22 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    // Signup endpoint (returns token as a plain string for simplicity)
     @PostMapping("/signup")
-    public String signup(@RequestBody SignupRequest request) {
-        return userService.register(request);  // Registration returns token
+    public ResponseEntity<String> signup(@RequestBody SignupRequest request) {
+        String token = userService.register(request);
+        return ResponseEntity.ok(token);
     }
 
+    // Login endpoint (returns token and role)
     @PostMapping("/login")
-    public AuthResponse login(@RequestBody LoginRequest request) {
-        // Call login service and get token + role
+    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         AuthResponse authResponse = userService.login(request);
 
-        // Check if login was successful (i.e., return value is not null)
         if (authResponse != null) {
-            return authResponse;  // Return both token and role
+            return ResponseEntity.ok(authResponse); // 200 OK with token + role
         } else {
-            // Invalid login, return null or send a custom error response
-            return null;
+            return ResponseEntity.status(401).body("Invalid username or password");
         }
     }
 }
