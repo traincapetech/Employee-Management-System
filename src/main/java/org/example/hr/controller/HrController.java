@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/hrs")
@@ -20,6 +21,7 @@ public class HrController {
     public ResponseEntity<?> createHr(@RequestBody HrCreationRequest request) {
         try {
             Hr hr = Hr.builder()
+                    .id(UUID.randomUUID().toString())  // Generate UUID here for HR
                     .fullName(request.getFullName())
                     .email(request.getEmail())
                     .phoneNumber(request.getPhoneNumber())

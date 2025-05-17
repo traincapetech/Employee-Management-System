@@ -2,6 +2,7 @@ package org.example.user.service;
 
 import org.example.config.JwtUtil;
 import org.example.employee.model.Employee;
+import org.example.hr.repository.HrRepository;
 import org.example.user.model.User;
 import org.example.user.dto.LoginRequest;
 import org.example.user.dto.AuthResponse;
@@ -12,12 +13,16 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private HrRepository hrRepository;
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -78,32 +83,34 @@ public class UserService {
     }
 
     public User createUser(String username, String password, String role, String referenceId) {
-        // Validate roles (Admin for HR, HR for Employee)
-        if ("HR".equals(role)) {
-            User admin = userRepository.findById(referenceId).orElseThrow(() ->
-                    new IllegalArgumentException("Admin with ID " + referenceId + " not found.")
-            );
-            if (!"ADMIN".equals(admin.getRole())) {
-                throw new IllegalArgumentException("Reference ID must be an Admin.");
-            }
-        } else if ("EMPLOYEE".equals(role)) {
-            User hr = userRepository.findById(referenceId).orElseThrow(() ->
-                    new IllegalArgumentException("HR with ID " + referenceId + " not found.")
-            );
-            if (!"HR".equals(hr.getRole())) {
-                throw new IllegalArgumentException("Reference ID must be an HR.");
-            }
+        if (userRepository.findByUsername(username).isPresent()) {
+            throw new IllegalArgumentException("Username '" + username + "' is already taken.");
         }
 
-        // Create and save the new user
+        if ("HR".equals(role)) {
+            // Simply check if HR exists; no role check needed
+            hrRepository.findById(referenceId)
+                    .orElseThrow(() -> new IllegalArgumentException("HR with ID " + referenceId + " not found."));
+        } else if ("EMPLOYEE".equals(role)) {
+            // For employee, reference must be a valid HR from hrRepository
+            hrRepository.findById(referenceId)
+                    .orElseThrow(() -> new IllegalArgumentException("HR with ID " + referenceId + " not found."));
+        }
+
+        // Create and save the user
         User user = new User();
+        user.setId(UUID.randomUUID().toString());
         user.setUsername(username);
         user.setPassword(passwordEncoder.encode(password));
-        user.setRole(role);  // Assign role (HR, Employee)
-        user.setReferenceId(referenceId);  // Set referenceId for HR or Admin
+        user.setRole(role);
+        user.setReferenceId(referenceId);
 
-        userRepository.save(user);
-        return user;
+        return userRepository.save(user);
     }
+
+
+
+
+
 
 }

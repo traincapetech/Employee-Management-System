@@ -4,9 +4,10 @@ import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.UUID;
+
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
 @Document(collection = "users")
 public class User {
@@ -17,7 +18,11 @@ public class User {
     private String username;
     private String password;
     private String role; // Single role field
-    private String referenceId;  // Reference ID for linking to Employee (or other models)
+    private String referenceId;
+
+    public User() {
+        this.id = UUID.randomUUID().toString(); // Generate UUID for new user
+    }// Reference ID for linking to Employee (or other models)
 
     // Add the setter for role if it's not there
     public void setRole(String role) {
