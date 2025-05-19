@@ -77,5 +77,21 @@ public class AttendanceService {
         return employee.getSalary() - deduction;
     }
 
+    public double calculateLeaveDeductions(String employeeId, int month, int year) {
+        double dailyRate = employeeRepository.findById(employeeId)
+                .map(emp -> emp.getSalary() / 30)
+                .orElseThrow(() -> new RuntimeException("Employee not found"));
+
+        LocalDate start = LocalDate.of(year, month, 1);
+        LocalDate end = start.withDayOfMonth(start.lengthOfMonth());
+
+        List<Attendance> attendances = attendanceRepository.findByEmployeeIdAndDateBetween(employeeId, start, end);
+        long leaveDays = attendances.stream().filter(a -> a.getStatus() == Attendance.Status.LEAVE).count();
+        long halfDays = attendances.stream().filter(a -> a.getStatus() == Attendance.Status.HALF_DAY).count();
+
+        return (leaveDays * dailyRate) + (halfDays * (dailyRate / 2));
+    }
+
+
 
 }

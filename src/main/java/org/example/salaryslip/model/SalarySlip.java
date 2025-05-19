@@ -1,4 +1,4 @@
-package org.example.attendence.model;
+package org.example.salaryslip.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,15 +14,10 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Document(collection = "salary_slips")
 public class SalarySlip {
-
     @Id
     private String id;
-
     private String employeeId;
     private String month; // Format: "2025-05"
     private byte[] pdfData;
-
     private LocalDate generatedDate;
-
-    // Getters and setters
 }
