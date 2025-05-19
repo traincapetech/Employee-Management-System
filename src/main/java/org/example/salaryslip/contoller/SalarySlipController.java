@@ -22,10 +22,11 @@ public class SalarySlipController {
     public ResponseEntity<String> generateSalarySlip(
             @PathVariable String employeeId,
             @RequestParam int month,
-            @RequestParam int year
+            @RequestParam int year,
+            @RequestParam(required = false, defaultValue = "0") double incentive
     ) {
         try {
-            salarySlipService.generateAndStoreSalarySlip(employeeId, year, month);
+            salarySlipService.generateAndStoreSalarySlip(employeeId, year, month, incentive);
             return ResponseEntity.ok("Salary slip generated successfully.");
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Failed: " + e.getMessage());
