@@ -4,7 +4,10 @@ import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
+import com.itextpdf.layout.element.Image;
 import com.itextpdf.layout.properties.TextAlignment;
+import com.itextpdf.layout.properties.HorizontalAlignment;
+import com.itextpdf.io.image.ImageDataFactory;
 import org.example.attendence.model.Attendance;
 import org.example.attendence.model.Attendance.Status;
 import org.example.attendence.repository.AttendanceRepository;
@@ -14,10 +17,14 @@ import org.example.employee.repository.EmployeeRepository;
 import org.example.salaryslip.model.SalarySlip;
 import org.example.salaryslip.repository.SalarySlipRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
 import com.itextpdf.layout.Document;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.YearMonth;
@@ -38,6 +45,12 @@ public class SalarySlipService {
 
     @Autowired
     private EmployeeRepository employeeRepository;
+
+    @Autowired
+    private ResourceLoader resourceLoader;
+
+    @Value("${company.logo.path:classpath:static/images/img.png}")
+    private String logoPath;
 
     public SalarySlip generateAndStoreSalarySlip(String employeeId, int year, int month, double incentiveAmount) throws Exception {
         Employee employee = employeeRepository.findById(employeeId)
@@ -79,6 +92,20 @@ public class SalarySlipService {
         PdfWriter writer = new PdfWriter(baos);
         PdfDocument pdfDoc = new PdfDocument(writer);
         Document doc = new Document(pdfDoc);
+
+        // Add logo at the top
+        try {
+            Resource resource = resourceLoader.getResource(logoPath);
+            Image logo = new Image(ImageDataFactory.create(resource.getInputStream().readAllBytes()));
+            // Set logo width to 20% of page width
+            float logoWidth = pdfDoc.getDefaultPageSize().getWidth() * 0.2f;
+            logo.setWidth(logoWidth);
+            logo.setHorizontalAlignment(HorizontalAlignment.CENTER);
+            doc.add(logo);
+        } catch (IOException ex) {
+            // Log the error but continue generating the document without the logo
+            System.err.println("Failed to load company logo: " + ex.getMessage());
+        }
 
         // Header - Company name
         doc.add(new Paragraph("Traincape Technology Pvt. Ltd.")
@@ -207,11 +234,6 @@ public class SalarySlipService {
         doc.add(new Paragraph("Employee Net Pay")
                 .setFontSize(10)
                 .setTextAlignment(TextAlignment.RIGHT));
-
-        doc.add(new Paragraph("\n-- This is a system-generated document. --")
-                .setItalic()
-                .setFontSize(8)
-                .setTextAlignment(TextAlignment.CENTER));
 
         doc.close();
 
