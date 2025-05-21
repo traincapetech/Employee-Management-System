@@ -21,25 +21,26 @@ public class Employee {
     private String linkedInUrl;
     private String currentAddress;
     private String permanentAddress;
-    private String photographPath;
+
+    private byte[] photograph; // JPEG image
 
     private String collegeName;
-    private String tenthMarksheetPath;
-    private String twelfthMarksheetPath;
-    private String bachelorDegreePath;
-    private String postgraduateDegreePath;
+    private byte[] tenthMarksheet;
+    private byte[] twelfthMarksheet;
+    private byte[] bachelorDegree;
+    private byte[] postgraduateDegree;
 
-    private String aadharCardPath;
-    private String panCardPath;
-    private String pccPath;
-    private String resumePath;
+    private byte[] aadharCard;
+    private byte[] panCard;
+    private byte[] pcc;
+    private byte[] resume;
 
     private String role;
     private String department;
     private Long joiningDate;
     private Integer internshipDuration;
-    private String offerLetterPath;
-    private String status;
+    private byte[] offerLetter;
 
-    private Double salary; // Monthly base salary
+    private String status;
+    private Double salary;
 }

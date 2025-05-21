@@ -2,6 +2,7 @@ package org.example.attendence.controller;
 
 import org.example.attendence.model.Attendance;
 import org.example.attendence.model.Attendance.Status;
+import org.example.attendence.repository.AttendanceRepository;
 import org.example.attendence.service.AttendanceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/attendance")
@@ -18,6 +20,9 @@ public class AttendanceController {
 
     @Autowired
     private AttendanceService attendanceService;
+
+    @Autowired
+    private AttendanceRepository attendanceRepository;
 
     @PostMapping("/{employeeId}/mark")
     public ResponseEntity<Attendance> markAttendance(
@@ -79,5 +84,19 @@ public class AttendanceController {
         double salary = attendanceService.calculateMonthlySalary(employeeId, month, year);
         return ResponseEntity.ok(salary);
     }
+
+    @PutMapping("/{attendanceId}")
+    public ResponseEntity<Attendance> updateAttendance(
+            @PathVariable String attendanceId,
+            @RequestBody Attendance updated) {
+
+        Optional<Attendance> existing = attendanceRepository.findById(attendanceId);
+        if (existing.isEmpty()) return ResponseEntity.notFound().build();
+
+        updated.setId(attendanceId);
+        Attendance saved = attendanceRepository.save(updated);
+        return ResponseEntity.ok(saved);
+    }
+
 
 }

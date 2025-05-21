@@ -1,6 +1,7 @@
 package org.example.salaryslip.contoller;
 
 import org.example.salaryslip.model.SalarySlip;
+import org.example.salaryslip.repository.SalarySlipRepository;
 import org.example.salaryslip.service.SalarySlipService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.time.YearMonth;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/salaryslip")
@@ -17,6 +19,9 @@ public class SalarySlipController {
 
     @Autowired
     private SalarySlipService salarySlipService;
+
+    @Autowired
+    private SalarySlipRepository salarySlipRepository;
 
     @PostMapping("/generate/{employeeId}")
     public ResponseEntity<String> generateSalarySlip(
@@ -52,4 +57,17 @@ public class SalarySlipController {
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(pdf);
     }
+
+    @DeleteMapping("/salary-slip/{employeeId}")
+    public ResponseEntity<?> deleteSalarySlip(
+            @PathVariable String employeeId,
+            @RequestParam String month) {
+        Optional<SalarySlip> slipOpt = salarySlipRepository.findByEmployeeIdAndMonth(employeeId, month);
+        if (slipOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        salarySlipRepository.delete(slipOpt.get());
+        return ResponseEntity.ok("Salary slip deleted for month: " + month);
+    }
+
 }
