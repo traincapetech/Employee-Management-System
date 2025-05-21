@@ -8,7 +8,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
+import java.io.DataInput;
 import java.util.List;
 
 @RestController
@@ -22,21 +25,46 @@ public class EmployeeController {
     private UserService userService;
 
     // Method to add employee with user creation (for Employee or HR)
-    @PostMapping
+    @PostMapping(consumes = "multipart/form-data")
     public ResponseEntity<?> addEmployeeWithUser(
-            @RequestPart("employee") String employeeJson,
+            @RequestPart("employee") String employeeJson,  // Raw JSON string
             @RequestPart("username") String username,
             @RequestPart("password") String password,
             @RequestPart("role") String role,
-            @RequestPart("referenceId") String referenceId
+            @RequestPart("referenceId") String referenceId,
+
+            @RequestPart("photograph") MultipartFile photograph,
+            @RequestPart("tenthMarksheet") MultipartFile tenthMarksheet,
+            @RequestPart("twelfthMarksheet") MultipartFile twelfthMarksheet,
+            @RequestPart("bachelorDegree") MultipartFile bachelorDegree,
+            @RequestPart("postgraduateDegree") MultipartFile postgraduateDegree,
+
+            @RequestPart("aadharCard") MultipartFile aadharCard,
+            @RequestPart("panCard") MultipartFile panCard,
+            @RequestPart("pcc") MultipartFile pcc,
+            @RequestPart("resume") MultipartFile resume,
+            @RequestPart("offerLetter") MultipartFile offerLetter
     ) {
         try {
-            // Create user first (HR or Employee)
+            // Create user first
             userService.createUser(username, password, role, referenceId);
 
-            // Parse the employee data from JSON
+            // Parse JSON string to Employee object
             ObjectMapper mapper = new ObjectMapper();
             Employee employee = mapper.readValue(employeeJson, Employee.class);
+
+            // Set file bytes
+            employee.setPhotograph(photograph.getBytes());
+            employee.setTenthMarksheet(tenthMarksheet.getBytes());
+            employee.setTwelfthMarksheet(twelfthMarksheet.getBytes());
+            employee.setBachelorDegree(bachelorDegree.getBytes());
+            employee.setPostgraduateDegree(postgraduateDegree.getBytes());
+
+            employee.setAadharCard(aadharCard.getBytes());
+            employee.setPanCard(panCard.getBytes());
+            employee.setPcc(pcc.getBytes());
+            employee.setResume(resume.getBytes());
+            employee.setOfferLetter(offerLetter.getBytes());
 
             // Save employee
             Employee savedEmployee = employeeService.saveEmployee(employee);
