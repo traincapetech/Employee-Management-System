@@ -1,6 +1,5 @@
 package org.example.user.service;
 
-
 import org.example.user.model.User;
 import org.example.user.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,11 +20,15 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-
+        // Find the user by username
         Optional<User> userOptional = userRepository.findByUsername(username);
-        userOptional.orElseThrow(() -> new UsernameNotFoundException("User not found : " + username));
-        User user = userOptional.get();
-        return (UserDetails) user;
-
+        
+        // Throw exception if user not found
+        if (!userOptional.isPresent()) {
+            throw new UsernameNotFoundException("User not found : " + username);
+        }
+        
+        // Return the User object directly since it now implements UserDetails
+        return userOptional.get();
     }
 }
