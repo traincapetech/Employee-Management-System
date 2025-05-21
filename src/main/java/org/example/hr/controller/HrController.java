@@ -53,4 +53,16 @@ public class HrController {
         hrService.deleteHr(id);
         return ResponseEntity.ok().build();
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateHr(@PathVariable String id, @RequestBody Hr updatedHr) {
+        Hr hr = hrService.getHrById(id);
+        if (hr == null) {
+            return ResponseEntity.notFound().build();
+        }
+        updatedHr.setId(id);
+        Hr saved = hrService.updateHr(updatedHr);
+        return ResponseEntity.ok(saved);
+    }
+
 }

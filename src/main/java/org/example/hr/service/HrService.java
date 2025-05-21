@@ -40,6 +40,11 @@ public class HrService {
         return savedHr;
     }
 
+    public Hr updateHr(Hr hr) {
+        return hrRepository.save(hr);
+    }
+
+
     public List<Hr> getAllHrs() {
         return hrRepository.findAll();
     }
