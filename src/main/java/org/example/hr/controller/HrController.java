@@ -28,6 +28,7 @@ public class HrController {
                     .department(request.getDepartment())
                     .joiningDate(request.getJoiningDate())
                     .status(request.getStatus())
+                    .referredByAdminId(request.getReferredByAdminId()) // set ref
                     .build();
 
             Hr createdHr = hrService.createHr(hr, request.getUsername(), request.getPassword());
@@ -64,5 +65,12 @@ public class HrController {
         Hr saved = hrService.updateHr(updatedHr);
         return ResponseEntity.ok(saved);
     }
+
+    @GetMapping("/by-admin/{adminId}")
+    public ResponseEntity<List<Hr>> getHrsByAdminId(@PathVariable String adminId) {
+        List<Hr> hrs = hrService.getHrsByAdminId(adminId);
+        return ResponseEntity.ok(hrs);
+    }
+
 
 }

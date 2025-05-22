@@ -107,4 +107,11 @@ public class EmployeeController {
         employeeService.deleteEmployee(id);
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("/by-hr/{hrId}")
+    public ResponseEntity<List<Employee>> getEmployeesByHrId(@PathVariable String hrId) {
+        List<Employee> employees = employeeService.getEmployeesByHrId(hrId);
+        return ResponseEntity.ok(employees);
+    }
+
 }
