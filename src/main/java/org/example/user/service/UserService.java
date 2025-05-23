@@ -89,11 +89,11 @@ public class UserService {
 
         if ("HR".equals(role)) {
             // Simply check if HR exists; no role check needed
-            hrRepository.findById(referenceId)
+            userRepository.findById(referenceId)
                     .orElseThrow(() -> new IllegalArgumentException("HR with ID " + referenceId + " not found."));
         } else if ("EMPLOYEE".equals(role)) {
             // For employee, reference must be a valid HR from hrRepository
-            hrRepository.findById(referenceId)
+            userRepository.findById(referenceId)
                     .orElseThrow(() -> new IllegalArgumentException("HR with ID " + referenceId + " not found."));
         }
 
