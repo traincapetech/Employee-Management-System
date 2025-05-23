@@ -10,7 +10,7 @@ public class HrCreationRequest {
     private String department;
     private Long joiningDate;
     private String status;
-
+    private String referredByAdminId; // New field
     private String username;
     private String password;
 }

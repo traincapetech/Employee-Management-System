@@ -32,4 +32,13 @@ public class EmployeeService {
     public List<Employee> getAllEmployees() {
         return employeeRepository.findAll();
     }
+
+    public List<Employee> getEmployeesByHrId(String hrId) {
+        return employeeRepository.findByHrId(hrId);
+    }
+
+    public List<Employee> getEmployeesByStatus(String status) {
+        return employeeRepository.findByStatus(status);
+    }
+
 }

@@ -43,4 +43,6 @@ public class Employee {
 
     private String status;
     private Double salary;
+
+    private String hrId;  // ID of the HR who created/added this employee
 }

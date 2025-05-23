@@ -18,7 +18,7 @@ public class Hr {
     private String email;
     private String phoneNumber;
     private String department;
-
+    private String referredByAdminId;
     private Long joiningDate;
     private String status; // e.g. Active, Inactive
 }

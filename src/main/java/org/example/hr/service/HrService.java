@@ -56,4 +56,13 @@ public class HrService {
     public void deleteHr(String id) {
         hrRepository.deleteById(id);
     }
+
+    public List<Hr> getHrsByAdminId(String adminId) {
+        return hrRepository.findByReferredByAdminId(adminId);
+    }
+
+    public List<Hr> getHrsByStatus(String status) {
+        return hrRepository.findByStatus(status);
+    }
+
 }
