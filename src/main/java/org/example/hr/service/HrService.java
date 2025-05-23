@@ -27,13 +27,16 @@ public class HrService {
             throw new IllegalArgumentException("Username already taken.");
         }
 
-        hr.setId(UUID.randomUUID().toString());
+        String id = UUID.randomUUID().toString();
+        hr.setId(id);
         Hr savedHr = hrRepository.save(hr);
 
         User user = new User();
+        user.setId(id);
         user.setUsername(username);
         user.setPassword(passwordEncoder.encode(password));
         user.setRole("HR");
+        user.setReferenceId(id);
 
         userRepository.save(user);
 
@@ -43,7 +46,6 @@ public class HrService {
     public Hr updateHr(Hr hr) {
         return hrRepository.save(hr);
     }
-
 
     public List<Hr> getAllHrs() {
         return hrRepository.findAll();
@@ -60,5 +62,4 @@ public class HrService {
     public List<Hr> getHrsByAdminId(String adminId) {
         return hrRepository.findByReferredByAdminId(adminId);
     }
-
 }
