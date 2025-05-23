@@ -31,7 +31,7 @@ public class EmployeeController {
             @RequestPart("username") String username,
             @RequestPart("password") String password,
             @RequestPart("role") String role,
-            @RequestPart("referenceId") String referenceId,
+            @RequestPart(value = "referenceId", required = false) String referenceId,
 
             @RequestPart("photograph") MultipartFile photograph,
             @RequestPart("tenthMarksheet") MultipartFile tenthMarksheet,
@@ -46,8 +46,9 @@ public class EmployeeController {
             @RequestPart("offerLetter") MultipartFile offerLetter
     ) {
         try {
-            // Create user first
-            userService.createUser(username, password, role, referenceId);
+            // Create user first - use the referenceId if provided, otherwise null
+            String actualReferenceId = referenceId != null ? referenceId : "";
+            userService.createUser(username, password, role, actualReferenceId);
 
             // Parse JSON string to Employee object
             ObjectMapper mapper = new ObjectMapper();

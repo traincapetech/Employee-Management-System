@@ -87,14 +87,28 @@ public class UserService {
             throw new IllegalArgumentException("Username '" + username + "' is already taken.");
         }
 
-        if ("HR".equals(role)) {
-            // Simply check if HR exists; no role check needed
-            userRepository.findById(referenceId)
-                    .orElseThrow(() -> new IllegalArgumentException("HR with ID " + referenceId + " not found."));
+        // For ADMIN users, we don't need to validate the referenceId
+        if ("ADMIN".equals(role)) {
+            // Admin can be created without reference validation
+            // Just log the action
+            System.out.println("Creating ADMIN user with username: " + username);
+        }
+        else if ("HR".equals(role)) {
+            // For HR, check if the reference (usually an admin) exists
+            if (referenceId == null || referenceId.isEmpty()) {
+                System.out.println("Warning: HR created without reference ID");
+            } else {
+                userRepository.findById(referenceId)
+                        .orElseThrow(() -> new IllegalArgumentException("Referenced user with ID " + referenceId + " not found."));
+            }
         } else if ("EMPLOYEE".equals(role)) {
-            // For employee, reference must be a valid HR from hrRepository
-            userRepository.findById(referenceId)
-                    .orElseThrow(() -> new IllegalArgumentException("HR with ID " + referenceId + " not found."));
+            // For employee, reference should be an HR
+            if (referenceId == null || referenceId.isEmpty()) {
+                System.out.println("Warning: Employee created without reference ID");
+            } else {
+                userRepository.findById(referenceId)
+                        .orElseThrow(() -> new IllegalArgumentException("HR with ID " + referenceId + " not found."));
+            }
         }
 
         // Create and save the user
