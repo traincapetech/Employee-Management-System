@@ -20,8 +20,11 @@ public class HrController {
     @PostMapping
     public ResponseEntity<?> createHr(@RequestBody HrCreationRequest request) {
         try {
+            // Generate a shared ID that will be used for both HR and user
+            String sharedId = UUID.randomUUID().toString();
+            
             Hr hr = Hr.builder()
-                    .id(UUID.randomUUID().toString())  // Generate UUID here for HR
+                    .id(sharedId)  // Use the shared ID
                     .fullName(request.getFullName())
                     .email(request.getEmail())
                     .phoneNumber(request.getPhoneNumber())

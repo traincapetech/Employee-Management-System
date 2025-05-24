@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.Valid;
 import java.io.DataInput;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/employees")
@@ -46,13 +47,15 @@ public class EmployeeController {
             @RequestPart("offerLetter") MultipartFile offerLetter
     ) {
         try {
-            // Create user first - use the referenceId if provided, otherwise null
-            String actualReferenceId = referenceId != null ? referenceId : "";
-            userService.createUser(username, password, role, actualReferenceId);
-
+            // Generate a shared ID that will be used for both employee and user
+            String sharedId = UUID.randomUUID().toString();
+            
             // Parse JSON string to Employee object
             ObjectMapper mapper = new ObjectMapper();
             Employee employee = mapper.readValue(employeeJson, Employee.class);
+            
+            // Set the generated ID for the employee
+            employee.setId(sharedId);
 
             // Set file bytes
             employee.setPhotograph(photograph.getBytes());
@@ -67,12 +70,18 @@ public class EmployeeController {
             employee.setResume(resume.getBytes());
             employee.setOfferLetter(offerLetter.getBytes());
 
-            // Save employee
+            // Save employee first
             Employee savedEmployee = employeeService.saveEmployee(employee);
+            
+            // Create user with the same ID as the employee
+            // Use referenceId for HR relationship (this is the hrId from the employee object)
+            String actualReferenceId = referenceId != null ? referenceId : employee.getHrId();
+            userService.createUserWithId(sharedId, username, password, role, actualReferenceId);
+
             return ResponseEntity.ok(savedEmployee);
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.internalServerError().body("Failed to save employee.");
+            return ResponseEntity.internalServerError().body("Failed to save employee: " + e.getMessage());
         }
     }
 

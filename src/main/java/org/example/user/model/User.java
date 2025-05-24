@@ -30,8 +30,9 @@ public class User implements UserDetails {
     private boolean enabled = true;
 
     public User() {
-        this.id = UUID.randomUUID().toString(); // Generate UUID for new user
-    }// Reference ID for linking to Employee (or other models)
+        // Don't automatically generate ID - we'll set it explicitly
+        // to match employee ID when needed
+    }
 
     // UserDetails implementation methods
     @Override

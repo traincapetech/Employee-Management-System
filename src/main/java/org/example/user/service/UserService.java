@@ -72,16 +72,20 @@ public class UserService {
         return role.equals("ADMIN") || role.equals("HR") || role.equals("EMPLOYEE");
     }
 
+    // Updated to use the provided employee ID for the user
     public User createUserForEmployee(String username, String password, Employee employee) {
         User user = new User();
+        // Use the employee's ID for the user ID to ensure they share the same ID
+        user.setId(employee.getId());
         user.setUsername(username);
         user.setPassword(passwordEncoder.encode(password));
-        user.setRole("EMPLOYEE"); // Set the role as EMPLOYEE (can be extended for Admin, HR)
-        user.setReferenceId(employee.getId()); // Link the user to the employee entity
+        user.setRole("EMPLOYEE"); // Set the role as EMPLOYEE
+        user.setReferenceId(employee.getHrId()); // Link the user to the HR who created the employee
         userRepository.save(user);
         return user;
     }
 
+    // Updated to allow sharing IDs between user and employee records
     public User createUser(String username, String password, String role, String referenceId) {
         if (userRepository.findByUsername(username).isPresent()) {
             throw new IllegalArgumentException("Username '" + username + "' is already taken.");
@@ -113,6 +117,8 @@ public class UserService {
 
         // Create and save the user
         User user = new User();
+        // We'll use UUID for ID generation, but this ID will be shared with employee record
+        // when created through the employee controller
         user.setId(UUID.randomUUID().toString());
         user.setUsername(username);
         user.setPassword(passwordEncoder.encode(password));
@@ -122,4 +128,20 @@ public class UserService {
         return userRepository.save(user);
     }
     
+    // New method to create user with specific ID (used for synchronizing with employee records)
+    public User createUserWithId(String id, String username, String password, String role, String referenceId) {
+        if (userRepository.findByUsername(username).isPresent()) {
+            throw new IllegalArgumentException("Username '" + username + "' is already taken.");
+        }
+
+        // Create and save the user with the provided ID
+        User user = new User();
+        user.setId(id); // Use the provided ID instead of generating a new one
+        user.setUsername(username);
+        user.setPassword(passwordEncoder.encode(password));
+        user.setRole(role);
+        user.setReferenceId(referenceId);
+
+        return userRepository.save(user);
+    }
 }

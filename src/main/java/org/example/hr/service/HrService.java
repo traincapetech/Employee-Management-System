@@ -27,13 +27,21 @@ public class HrService {
             throw new IllegalArgumentException("Username already taken.");
         }
 
-        hr.setId(UUID.randomUUID().toString());
+        // Generate a shared ID if not already set
+        if (hr.getId() == null || hr.getId().isEmpty()) {
+            hr.setId(UUID.randomUUID().toString());
+        }
+        
+        // Save the HR entity
         Hr savedHr = hrRepository.save(hr);
 
+        // Create user with the same ID as the HR
         User user = new User();
+        user.setId(savedHr.getId()); // Use the same ID
         user.setUsername(username);
         user.setPassword(passwordEncoder.encode(password));
         user.setRole("HR");
+        user.setReferenceId(hr.getReferredByAdminId()); // Set the admin reference
 
         userRepository.save(user);
 
