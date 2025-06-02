@@ -59,6 +59,7 @@ public class EmployeeController {
             employee.setPcc(pcc.getBytes());
             employee.setResume(resume.getBytes());
             employee.setOfferLetter(offerLetter.getBytes());
+            employee.setHrId(referenceId);
 
             // Save employee first
             employeeService.saveEmployee(employee);
