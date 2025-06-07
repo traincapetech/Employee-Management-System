@@ -1,5 +1,6 @@
 package org.example.attendence.service;
 
+import org.example.attendence.dto.AttendanceStatsResponse;
 import org.example.attendence.model.Attendance;
 import org.example.attendence.model.Attendance.Status;
 import org.example.attendence.repository.AttendanceRepository;
@@ -90,6 +91,16 @@ public class AttendanceService {
         long halfDays = attendances.stream().filter(a -> a.getStatus() == Attendance.Status.HALF_DAY).count();
 
         return (leaveDays * dailyRate) + (halfDays * (dailyRate / 2));
+    }
+
+    public AttendanceStatsResponse getAttendanceSummary(String employeeId, LocalDate startDate, LocalDate endDate) {
+        List<Attendance> attendances = attendanceRepository.findByEmployeeIdAndDateBetween(employeeId, startDate, endDate);
+
+        long present = attendances.stream().filter(a -> a.getStatus() == Attendance.Status.PRESENT).count();
+        long absent = attendances.stream().filter(a -> a.getStatus() == Attendance.Status.ABSENT).count();
+        long halfDay = attendances.stream().filter(a -> a.getStatus() == Attendance.Status.HALF_DAY).count();
+
+        return new AttendanceStatsResponse(attendances, present, absent, halfDay);
     }
 
 

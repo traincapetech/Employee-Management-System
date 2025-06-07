@@ -1,5 +1,6 @@
 package org.example.attendence.controller;
 
+import org.example.attendence.dto.AttendanceStatsResponse;
 import org.example.attendence.model.Attendance;
 import org.example.attendence.model.Attendance.Status;
 import org.example.attendence.repository.AttendanceRepository;
@@ -97,6 +98,17 @@ public class AttendanceController {
         Attendance saved = attendanceRepository.save(updated);
         return ResponseEntity.ok(saved);
     }
+
+    @GetMapping("/{employeeId}/summary")
+    public ResponseEntity<AttendanceStatsResponse> getAttendanceSummary(
+            @PathVariable String employeeId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+    ) {
+        AttendanceStatsResponse response = attendanceService.getAttendanceSummary(employeeId, startDate, endDate);
+        return ResponseEntity.ok(response);
+    }
+
 
 
 }
