@@ -3,6 +3,7 @@ package org.example.employee.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.employee.model.Employee;
 import org.example.employee.service.EmployeeService;
+import org.example.hr.repository.HrRepository;
 import org.example.user.model.User;
 import org.example.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,9 @@ public class EmployeeController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private HrRepository hrRepository;
+
     @PostMapping(consumes = "multipart/form-data")
     public ResponseEntity<?> addEmployeeWithUser(
             @RequestPart("employee") String employeeJson,
@@ -41,6 +45,11 @@ public class EmployeeController {
             @RequestPart("offerLetter") MultipartFile offerLetter
     ) {
         try {
+            // ✅ Check if HR with the given referenceId exists
+            if (!hrRepository.existsById(referenceId)) {
+                return ResponseEntity.badRequest().body("HR with ID " + referenceId + " not found.");
+            }
+
             ObjectMapper mapper = new ObjectMapper();
             Employee employee = mapper.readValue(employeeJson, Employee.class);
 
