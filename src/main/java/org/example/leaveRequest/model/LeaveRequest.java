@@ -15,7 +15,7 @@ public class LeaveRequest {
 
     @Id
     private String id;
-
+    private String adminId;     // Admin approving HR leave
     private String employeeId;
     private String hrId;
 

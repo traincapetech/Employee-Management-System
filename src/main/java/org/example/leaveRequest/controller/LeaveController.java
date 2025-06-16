@@ -38,4 +38,16 @@ public class LeaveController {
     public ResponseEntity<List<LeaveRequest>> getHrLeaves(@PathVariable String hrId) {
         return ResponseEntity.ok(leaveService.getLeavesForHR(hrId));
     }
+
+    // HR applies for leave to admin
+    @PostMapping("/hr/apply")
+    public ResponseEntity<LeaveRequest> applyLeaveByHr(@RequestBody LeaveRequest request) {
+        return ResponseEntity.ok(leaveService.hrApplyLeave(request));
+    }
+
+    // Admin gets all HR leave requests
+    @GetMapping("/admin/{adminId}/hr-requests")
+    public ResponseEntity<List<LeaveRequest>> getHrLeaveRequests(@PathVariable String adminId) {
+        return ResponseEntity.ok(leaveService.getHrLeaveRequestsForAdmin(adminId));
+    }
 }
